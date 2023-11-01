@@ -40,11 +40,11 @@ year_months.each do |month_year|
       tags: tags,
       url: File.join(base_url, item_path),
       article_datetime: tokyo.to_local(Time.parse(json['entryState']['entryMap'][entry_id]['entry_created_datetime'])),
-      secure: false,
+      secure_type: 0,
       created_datetime: tokyo.to_local(Time.now)
     }
   end
   puts "Done #{month_year}!"
 end
 
-File.write(File.join(Dir.pwd, 'src', 'ameblo_tohokulax08', 'list.json'), JSON.pretty_generate(outputs))
+File.write(File.join(Dir.pwd, 'public', 'ameblo_tohokulax08', 'list.json'), JSON.pretty_generate(outputs))
