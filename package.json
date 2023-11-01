@@ -14,6 +14,7 @@
     "next": "14.0.1",
     "react": "^18",
     "react-dom": "^18",
+    "react-highlight-words": "^0.20.0",
     "tiny-segmenter": "^0.2.0"
   },
   "devDependencies": {
@@ -21,6 +22,7 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/react-highlight-words": "^0.16.6",
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
     "eslint-config-next": "14.0.1",

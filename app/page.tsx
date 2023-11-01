@@ -1,111 +1,75 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
-import Fuse, { IFuseOptions, FuseResultMatch } from "fuse.js";
-import data from "@/public/ameblo_tohokulax08/list.json";
-import data_2008 from "@/public/ameblo_tohokulax08/2008.json";
-import moji from "moji";
-import TinySegmenter from "tiny-segmenter";
-
-const segmenter = new TinySegmenter();
-
-function tokenize(text: string) {
-  const query = moji(text)
-    .convert("HK", "ZK")
-    .convert("ZS", "HS")
-    .convert("ZE", "HE")
-    .toString()
-    .trim();
-  return segmenter
-    .segment(query)
-    .map((word: string) => {
-      if (word !== " ") {
-        return moji(word).convert("HG", "KK").toString().toLowerCase();
-      }
-    })
-    .filter((v: string) => v);
-}
-
-function encode(text: string) {
-  return moji(text)
-    .convert("HK", "ZK")
-    .convert("ZS", "HS")
-    .convert("ZE", "HE")
-    .convert("HG", "KK")
-    .toString()
-    .trim()
-    .toLowerCase();
-}
+// import data_2008 from "@/public/ameblo_tohokulax08/2008.json";
+import Highlighter from "react-highlight-words";
+import React, { useEffect } from "react";
 
 interface ListItem {
   id: string;
   title: string;
-  search_title: string;
-  tokenized_title: string;
   tags: string[];
   url: string;
-  contents?: string;
-  search_contents?: string;
-  tokenized_contents?: string;
+  contents: string;
   article_datetime: string;
   created_datetime: string;
   secure_type: number;
 }
 
-const search_data: ListItem[] = data_2008.map((item) => {
-  return {
-    ...item,
-    search_title: encode(item.title),
-    tokenized_title: tokenize(item.title),
-    search_contents: encode(item.contents),
-    tokenized_contents: tokenize(item.contents),
-  };
-});
-
-export default function Home() {
-  const [query, setQuery] = useState<string>("");
-  const [results, setResults] = useState<ListItem[]>(search_data);
-  const [matches, setMatches] = useState<
-    (readonly FuseResultMatch[] | undefined)[]
-  >([]);
-
+export default function Sub() {
+  const [query, setQuery] = React.useState("");
+  const [rawData, setRawData] = React.useState<ListItem[]>([]);
+  const [results, setResults] = React.useState<ListItem[]>([]);
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     setQuery(value);
 
     if (value.length === 0) {
-      setResults(search_data);
+      setResults(rawData);
       return;
     }
 
-    const options: IFuseOptions<ListItem> = {
-      includeScore: true,
-      includeMatches: true,
-      minMatchCharLength: 2,
-      threshold: 0.3,
-      keys: [
-        "tags",
-        "search_title",
-        "tokenized_title",
-        "search_contents",
-        "tokenized_contents",
-      ],
-    };
-
-    const fuse = new Fuse(search_data, options);
-    console.log(encode(value));
-    const result = fuse.search(encode(value));
-    console.log(result);
-    setMatches(result.map((item) => item.matches));
-    const matches = result.map((item) => item.item);
-    setResults(matches);
+    console.log(value);
+    setResults(
+      rawData.filter(
+        (item) =>
+          item.title.includes(value) ||
+          item.contents.includes(value) ||
+          item.tags.some((tag) => tag.includes(value))
+      )
+    );
   };
+  useEffect(() => {
+    async function fetch_data() {
+      const fetch_data = await fetch("/ameblo_tohokulax08/2008.json");
+      const json = await fetch_data.json();
+      setRawData(json);
+      setResults(json);
+    }
+    fetch_data();
+  }, []);
 
   return (
     <main className="container mx-auto px-4 my-12">
-      <div className="flex items-center border-b border-violet-900 py-2">
+      <div className="relative flex items-center border-b border-violet-900 py-2">
+        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+          <svg
+            className="w-4 h-4 text-gray-500 dark:text-gray-400"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 20 20"
+          >
+            <path
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+            />
+          </svg>
+        </div>
         <input
-          className="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none"
+          className="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 pl-10 pr-2 leading-tight focus:outline-none"
           type="text"
           value={query}
           onChange={handleSearch}
@@ -123,64 +87,39 @@ export default function Home() {
             className="block rounded overflow-hidden shadow hover:shadow-lg hover:scale-105 mt-8"
           >
             <div className="px-6 py-4">
-              <div className="font-bold text-xl mb-2 text-violet-900">
-                {item.title}
-              </div>
-              <HighlightText text={item.title} matches={matches} />
-              <p className="text-gray-500 text-sm">{item.contents}</p>
+              <Highlighter
+                className="block font-bold text-xl mb-2 text-violet-900"
+                highlightClassName="bg-yellow-200"
+                searchWords={[query]}
+                autoEscape={true}
+                textToHighlight={item.title}
+              />
+              <Highlighter
+                className="block text-gray-500 text-sm"
+                highlightClassName="bg-yellow-200"
+                searchWords={[query]}
+                autoEscape={true}
+                textToHighlight={item.contents}
+              />
             </div>
-            <div className="px-6 pt-4 pb-2">
-              {item.tags.map((tag, index) => (
-                <span
-                  key={index}
-                  className="inline-block bg-gray-200 rounded-full px-3 py-1 text-xs font-semibold text-gray-500 mr-2 mb-2"
-                >
-                  {tag}
-                </span>
-              ))}
+            <div className="grid md:grid-cols-2 grid-cols-1 gap-2 px-6 pb-4">
+              <div className="">
+                {item.tags.map((tag, index) => (
+                  <span
+                    key={index}
+                    className="inline-block bg-gray-200 rounded-full px-3 py-1 text-xs font-semibold text-gray-500 mr-2"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              <div className="text-right text-gray-300 italic text-sm">
+                {item.article_datetime.slice(0, 16)}
+              </div>
             </div>
           </a>
         ))}
       </ul>
     </main>
   );
-}
-
-function HighlightText({
-  text,
-  matches,
-}: {
-  text: string;
-  matches: (readonly FuseResultMatch[] | undefined)[];
-}) {
-  let lastIndex = 0;
-  const elements = [];
-
-  matches.forEach((ranges, index) => {
-    if (typeof ranges === "undefined") {
-      return;
-    }
-    ranges
-      .filter((range) => range.key === "search_title")
-      .forEach((range, i) => {
-        const before = text.slice(lastIndex, range.indices[0][0]);
-        const highlight = text.slice(range.indices[0][0], range.indices[0][1]);
-
-        elements.push(<span key={lastIndex}>{before}</span>);
-        elements.push(
-          <span
-            key={`${index}_${i}_${range.indices[0][0]}`}
-            className="bg-yellow-200"
-          >
-            {highlight}
-          </span>
-        );
-
-        lastIndex = range.indices[0][1];
-      });
-  });
-
-  elements.push(<span key={`${lastIndex}_aaa`}>{text.slice(lastIndex)}</span>);
-
-  return <p>{elements}</p>;
 }
