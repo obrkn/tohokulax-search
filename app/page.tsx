@@ -29,7 +29,8 @@ interface Theme {
 enum Color {
   Violet900,
   Blue700,
-  Amber900,
+  Amber700,
+  Pink700,
 }
 enum Icon {
   Dragon,
@@ -58,8 +59,16 @@ const Themes = [
     title: "東北大学男子ラクロス部チームスタッフブログ",
     description: "東北大学男子ラクロス部チームスタッフのブログです。",
     period: "2010年 - 2019年",
-    color: Color.Amber900,
+    color: Color.Amber700,
     icon: Icon.Dragon,
+  },
+  {
+    id: "livedoor#jolax",
+    title: "へこたれへん！！！！",
+    description: "東北大女子ラクロス部★部内日記",
+    period: "2006年 - 2017年",
+    color: Color.Pink700,
+    icon: Icon.Humbler,
   },
 ];
 
@@ -68,9 +77,17 @@ export default function Sub() {
   const [rawData, setRawData] = React.useState<ListItem[]>(DefaultData);
   const [results, setResults] = React.useState<ListItem[]>(DefaultData);
   const [isOpen, setIsOpen] = React.useState(true);
-  const [currentTag, setCurrentTag] = React.useState("ameblo#tohokulax08");
+  const [currentTag, setCurrentTag] = React.useState(
+    localStorage.getItem("currentTag") || "ameblo#tohokulax08"
+  );
   const [isLogo, setIsLogo] = React.useState(false);
-  const [currentTheme, setCurrentTheme] = React.useState<Theme>(Themes[0]);
+  const [currentTheme, setCurrentTheme] = React.useState<Theme>(() => {
+    const themeId = localStorage.getItem("currentThemeId");
+    if (themeId) {
+      return Themes.find((item) => item.id === themeId) || Themes[0];
+    }
+    return Themes[0];
+  });
 
   React.useEffect(() => {
     setRawData(
@@ -79,11 +96,17 @@ export default function Sub() {
     setResults(
       DefaultData.filter((item) => item.tags.some((tag) => tag === currentTag))
     );
+    setCurrentTheme(
+      (prev) => Themes.find((item) => item.id === currentTag) || prev
+    );
+    setQuery("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    localStorage.setItem("currentTag", currentTag);
   }, [currentTag]);
 
   React.useEffect(() => {
-    setCurrentTheme(Themes.find((item) => item.id === currentTag) || Themes[0]);
-  }, [currentTag]);
+    localStorage.setItem("currentThemeId", currentTheme.id);
+  }, [currentTheme]);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
@@ -124,7 +147,9 @@ export default function Sub() {
             ? "border-violet-900"
             : currentTheme.color === 1
             ? "border-blue-700"
-            : `border-amber-900`
+            : currentTheme.color === 2
+            ? `border-amber-700`
+            : `border-pink-700`
         }`}
       >
         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -179,7 +204,9 @@ export default function Sub() {
                 ? "hover:border-violet-900"
                 : currentTheme.color === 1
                 ? "hover:border-blue-700"
-                : "hover:border-amber-900"
+                : currentTheme.color === 2
+                ? "hover:border-amber-700"
+                : "hover:border-pink-700"
             }`}
           >
             <a
@@ -194,7 +221,9 @@ export default function Sub() {
                     ? "text-violet-900"
                     : currentTheme.color === 1
                     ? "text-blue-700"
-                    : "text-amber-900"
+                    : currentTheme.color === 2
+                    ? "text-amber-700"
+                    : "text-pink-700"
                 }`}
                 highlightClassName="bg-yellow-200"
                 searchWords={[query]}
@@ -212,17 +241,19 @@ export default function Sub() {
             </a>
             <div className="grid md:grid-cols-2 grid-cols-1 gap-2 px-6 pb-4">
               <div className="">
-                {item.tags.map((tag, index) => (
-                  <span
-                    key={index}
-                    onClick={() => {
-                      setCurrentTag(tag);
-                    }}
-                    className="inline-block bg-gray-200 rounded-full px-3 py-1 text-xs font-semibold text-gray-500 mr-2 cursor-pointer"
-                  >
-                    {tag}
-                  </span>
-                ))}
+                {item.tags
+                  .filter((tag) => tag !== "ブログ")
+                  .map((tag, index) => (
+                    <span
+                      key={index}
+                      onClick={() => {
+                        setCurrentTag(tag);
+                      }}
+                      className="inline-block bg-gray-200 rounded-full px-3 py-1 text-xs font-semibold text-gray-500 mr-2 cursor-pointer"
+                    >
+                      {tag}
+                    </span>
+                  ))}
               </div>
               <div className="text-right text-gray-300 italic text-sm pt-1">
                 {item.article_datetime.slice(0, 16)}
@@ -265,10 +296,13 @@ export default function Sub() {
                     type="radio"
                     id={item.id}
                     name="blogTag"
-                    defaultChecked={currentTag === item.id}
+                    defaultChecked={currentTheme.id === item.id}
                     className="hidden peer"
                     onChange={(e) => {
-                      if (e.target.checked) setCurrentTag(item.id);
+                      if (e.target.checked) {
+                        setCurrentTag(item.id);
+                        setIsOpen(false);
+                      }
                     }}
                   />
                   <label
@@ -278,7 +312,9 @@ export default function Sub() {
                         ? "peer-checked:border-violet-900"
                         : item.color === 1
                         ? "peer-checked:border-blue-700"
-                        : "peer-checked:border-amber-900"
+                        : item.color === 2
+                        ? "peer-checked:border-amber-700"
+                        : "peer-checked:border-pink-700"
                     }`}
                   >
                     <div className="text-center w-full">
@@ -304,7 +340,9 @@ export default function Sub() {
             ? "bg-violet-900"
             : currentTheme.color === 1
             ? "bg-blue-700"
-            : "bg-amber-900"
+            : currentTheme.color === 2
+            ? "bg-amber-700"
+            : "bg-pink-700"
         } ${
           isLogo ? "opacity-100" : "opacity-0 pointer-events-none"
         } transition-opacity duration-500`}

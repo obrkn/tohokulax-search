@@ -3,11 +3,10 @@ require 'open-uri'
 require 'json'
 require 'tzinfo'
 
-file_path = File.join(Dir.pwd, 'public', 'ameblo_humblers', 'list.json')
+file_path = File.join(Dir.pwd, 'public', 'ameblo_tohokulaxmgs16', 'list.json')
 data = JSON.parse(File.read(file_path))
 tokyo = TZInfo::Timezone.get('Asia/Tokyo')
-years = [2023]
-# years = [*2013..2023]
+years = [*2010..2019]
 years.each do |year|
   puts '----------------------------------------'
   puts "Processing #{year}..."
@@ -45,8 +44,8 @@ years.each do |year|
       created_datetime: tokyo.to_local(Time.now),
       secure_type: 0
     }
-    puts "Done #{item['url']}."
+    puts "Done #{item['url']}"
   end
 
-  File.write(File.join(Dir.pwd, 'public', 'ameblo_humblers', "#{year}.json"), JSON.pretty_generate(outputs))
+  File.write(File.join(Dir.pwd, 'public', 'ameblo_tohokulaxmgs16', "#{year}.json"), JSON.pretty_generate(outputs))
 end
