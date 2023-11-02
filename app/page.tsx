@@ -3,9 +3,9 @@
 // import data_2008 from "@/public/ameblo_tohokulax08/2008.json";
 import Highlighter from "react-highlight-words";
 import React, { useEffect } from "react";
-import { ameblo_tohokulax_data } from "@/app/data";
+import DefaultData from "@/app/data";
 
-interface ListItem {
+export interface ListItem {
   id: string;
   title: string;
   tags: string[];
@@ -33,25 +33,17 @@ const blogList = [
 
 export default function Sub() {
   const [query, setQuery] = React.useState("");
-  const [rawData, setRawData] = React.useState<ListItem[]>(
-    ameblo_tohokulax_data
-  );
-  const [results, setResults] = React.useState<ListItem[]>(
-    ameblo_tohokulax_data
-  );
+  const [rawData, setRawData] = React.useState<ListItem[]>(DefaultData);
+  const [results, setResults] = React.useState<ListItem[]>(DefaultData);
   const [isOpen, setIsOpen] = React.useState(false);
   const [currentTag, setCurrentTag] = React.useState("ameblo#tohokulax08");
 
   React.useEffect(() => {
     setRawData(
-      ameblo_tohokulax_data.filter((item) =>
-        item.tags.some((tag) => tag === currentTag)
-      )
+      DefaultData.filter((item) => item.tags.some((tag) => tag === currentTag))
     );
     setResults(
-      ameblo_tohokulax_data.filter((item) =>
-        item.tags.some((tag) => tag === currentTag)
-      )
+      DefaultData.filter((item) => item.tags.some((tag) => tag === currentTag))
     );
   }, [currentTag]);
 
