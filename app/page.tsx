@@ -4,6 +4,7 @@
 import Highlighter from "react-highlight-words";
 import React, { useEffect } from "react";
 import DefaultData from "@/app/data";
+import Image from "next/image";
 
 export interface ListItem {
   id: string;
@@ -16,18 +17,33 @@ export interface ListItem {
   secure_type: number;
 }
 
+interface BlogList {
+  id: string;
+  title: string;
+  description: string;
+  period: string;
+  images: string[];
+  color: Color;
+}
+
+type Color = "violet-900" | "blue-700";
+
 const blogList = [
   {
     id: "ameblo#tohokulax08",
     title: "東北大学男子ラクロス部",
     description: "～東北大学男子ラクロス部員のブログ～",
-    created_datetime: "2008年",
+    period: "2008年 - 現在",
+    images: ["/mens_sub.png", "/mens_old.png"],
+    color: 0,
   },
   {
     id: "ameblo#humblers",
     title: "HUMBLERSのブログ",
     description: "～ハンブロ～",
-    created_datetime: "2010年",
+    period: "2010年 - 現在",
+    images: ["/humblers_logo.jpeg", "/humblers_old.jpeg"],
+    color: 1,
   },
 ];
 
@@ -35,6 +51,7 @@ export default function Sub() {
   const [query, setQuery] = React.useState("");
   const [rawData, setRawData] = React.useState<ListItem[]>(DefaultData);
   const [results, setResults] = React.useState<ListItem[]>(DefaultData);
+  const [color, setColor] = React.useState(0);
   const [isOpen, setIsOpen] = React.useState(false);
   const [currentTag, setCurrentTag] = React.useState("ameblo#tohokulax08");
 
@@ -45,6 +62,10 @@ export default function Sub() {
     setResults(
       DefaultData.filter((item) => item.tags.some((tag) => tag === currentTag))
     );
+  }, [currentTag]);
+
+  React.useEffect(() => {
+    setColor(blogList.find((item) => item.id === currentTag)?.color || 0);
   }, [currentTag]);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,7 +89,11 @@ export default function Sub() {
       <div className="text-right -mt-6 pb-4 text-xs text-gray-400">
         データ更新日: 2023年11月01日
       </div>
-      <div className="relative flex items-center border-b border-violet-900 py-2">
+      <div
+        className={`relative flex items-center border-b py-2 ${
+          color === 0 ? "border-violet-900" : "border-blue-700"
+        }`}
+      >
         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
           <svg
             className="w-4 h-4 text-gray-500"
@@ -101,6 +126,9 @@ export default function Sub() {
           {currentTag}
         </span>
       </div>
+      <div className="text-gray-400 text-sm text-right mr-2 mt-2">
+        {results.length} / {rawData.length}
+      </div>
       <ul>
         {results.slice(0, 30).map((item) => (
           <a
@@ -108,11 +136,15 @@ export default function Sub() {
             target="_blank"
             rel="noopener noreferrer"
             key={item.id}
-            className="block rounded overflow-hidden shadow hover:shadow-lg hover:scale-105 mt-8"
+            className={`block rounded overflow-hidden shadow hover:shadow-lg hover:scale-105 mt-8 hover:border-2 ${
+              color === 0 ? "hover:border-violet-900" : "hover:border-blue-700"
+            }`}
           >
             <div className="px-6 py-4">
               <Highlighter
-                className="block font-bold text-xl mb-2 text-violet-900"
+                className={`block font-bold text-base mb-2 ${
+                  color === 0 ? "text-violet-900" : "text-blue-700"
+                }`}
                 highlightClassName="bg-yellow-200"
                 searchWords={[query]}
                 autoEscape={true}
@@ -120,6 +152,7 @@ export default function Sub() {
               />
               <Highlighter
                 className="block text-gray-500 text-sm"
+                unhighlightClassName={query.length === 0 ? "line-clamp-5" : ""}
                 highlightClassName="bg-yellow-200"
                 searchWords={[query]}
                 autoEscape={true}
@@ -190,12 +223,16 @@ export default function Sub() {
                     />
                     <label
                       htmlFor={item.id}
-                      className="inline-flex w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 hover:text-gray-600 peer-checked:text-gray-600 hover:bg-gray-50"
+                      className={`inline-flex w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer  hover:text-gray-600 peer-checked:text-gray-600 hover:bg-gray-50 ${
+                        item.color === 0
+                          ? "peer-checked:border-violet-900"
+                          : "peer-checked:border-blue-700"
+                      }`}
                     >
                       <div className="text-center w-full">
                         <p className="text-bold">{item.title}</p>
                         <p className="text-sm">{item.description}</p>
-                        <p className="text-xs">{item.created_datetime}</p>
+                        <p className="text-xs">{item.period}</p>
                       </div>
                     </label>
                   </li>
