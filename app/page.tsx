@@ -17,33 +17,49 @@ export interface ListItem {
   secure_type: number;
 }
 
-interface BlogList {
+interface Theme {
   id: string;
   title: string;
   description: string;
   period: string;
-  images: string[];
   color: Color;
+  icon: Icon;
 }
 
-type Color = "violet-900" | "blue-700";
+enum Color {
+  Violet900,
+  Blue700,
+  Amber900,
+}
+enum Icon {
+  Dragon,
+  Humbler,
+}
 
-const blogList = [
+const Themes = [
   {
     id: "ameblo#tohokulax08",
     title: "東北大学男子ラクロス部",
     description: "～東北大学男子ラクロス部員のブログ～",
     period: "2008年 - 現在",
-    images: ["/mens_sub.png", "/mens_old.png"],
-    color: 0,
+    color: Color.Violet900,
+    icon: Icon.Dragon,
   },
   {
     id: "ameblo#humblers",
     title: "HUMBLERSのブログ",
     description: "～ハンブロ～",
     period: "2010年 - 現在",
-    images: ["/humblers_logo.jpeg", "/humblers_old.jpeg"],
-    color: 1,
+    color: Color.Blue700,
+    icon: Icon.Humbler,
+  },
+  {
+    id: "ameblo#tohokulaxmgs16",
+    title: "東北大学男子ラクロス部チームスタッフブログ",
+    description: "東北大学男子ラクロス部チームスタッフのブログです。",
+    period: "2010年 - 2019年",
+    color: Color.Amber900,
+    icon: Icon.Dragon,
   },
 ];
 
@@ -51,9 +67,10 @@ export default function Sub() {
   const [query, setQuery] = React.useState("");
   const [rawData, setRawData] = React.useState<ListItem[]>(DefaultData);
   const [results, setResults] = React.useState<ListItem[]>(DefaultData);
-  const [color, setColor] = React.useState(0);
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = React.useState(true);
   const [currentTag, setCurrentTag] = React.useState("ameblo#tohokulax08");
+  const [isLogo, setIsLogo] = React.useState(false);
+  const [currentTheme, setCurrentTheme] = React.useState<Theme>(Themes[0]);
 
   React.useEffect(() => {
     setRawData(
@@ -65,7 +82,7 @@ export default function Sub() {
   }, [currentTag]);
 
   React.useEffect(() => {
-    setColor(blogList.find((item) => item.id === currentTag)?.color || 0);
+    setCurrentTheme(Themes.find((item) => item.id === currentTag) || Themes[0]);
   }, [currentTag]);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,14 +101,30 @@ export default function Sub() {
     );
   };
 
+  React.useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 1000) {
+        setIsLogo(true);
+      } else {
+        setIsLogo(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <main className="container mx-auto px-4 my-12">
       <div className="text-right -mt-6 pb-4 text-xs text-gray-400">
         データ更新日: 2023年11月01日
       </div>
       <div
-        className={`relative flex items-center border-b py-2 ${
-          color === 0 ? "border-violet-900" : "border-blue-700"
+        className={`relative flex items-center border-b-2 py-2 ${
+          currentTheme.color === 0
+            ? "border-violet-900"
+            : currentTheme.color === 1
+            ? "border-blue-700"
+            : `border-amber-900`
         }`}
       >
         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -112,7 +145,7 @@ export default function Sub() {
           </svg>
         </div>
         <input
-          className="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 pl-10 pr-2 leading-tight focus:outline-none"
+          className="appearance-none bg-transparent border-none flex-grow text-gray-700 mr-3 py-1 pl-10 leading-tight focus:outline-none"
           type="text"
           value={query}
           onChange={handleSearch}
@@ -121,29 +154,47 @@ export default function Sub() {
         />
         <span
           onClick={() => setIsOpen(true)}
-          className="inline-block bg-gray-200 rounded-full px-3 py-1 text-xs font-semibold text-gray-500 cursor-pointer hover:scale-105"
+          className="hidden md:inline-block bg-gray-200 rounded-full px-3 py-1 text-xs font-semibold text-gray-500 cursor-pointer hover:scale-105"
         >
           {currentTag}
         </span>
       </div>
-      <div className="text-gray-400 text-sm text-right mr-2 mt-2">
-        {results.length} / {rawData.length}
+      <div className="text-right mr-2 mt-2">
+        <span className="text-gray-400 text-sm">
+          {results.length} / {rawData.length}
+        </span>
+        <span
+          onClick={() => setIsOpen(true)}
+          className="md:hidden bg-gray-200 rounded-full px-3 py-1 text-xs font-semibold text-gray-500 cursor-pointer hover:scale-105 ml-2"
+        >
+          {currentTag}
+        </span>
       </div>
       <ul>
         {results.slice(0, 30).map((item) => (
-          <a
-            href={item.url}
-            target="_blank"
-            rel="noopener noreferrer"
+          <div
             key={item.id}
-            className={`block rounded overflow-hidden shadow hover:shadow-lg hover:scale-105 mt-8 hover:border-2 ${
-              color === 0 ? "hover:border-violet-900" : "hover:border-blue-700"
+            className={`rounded overflow-hidden shadow hover:shadow-lg hover:scale-105 mt-8 hover:border-2 ${
+              currentTheme.color === 0
+                ? "hover:border-violet-900"
+                : currentTheme.color === 1
+                ? "hover:border-blue-700"
+                : "hover:border-amber-900"
             }`}
           >
-            <div className="px-6 py-4">
+            <a
+              href={item.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block px-6 py-4"
+            >
               <Highlighter
                 className={`block font-bold text-base mb-2 ${
-                  color === 0 ? "text-violet-900" : "text-blue-700"
+                  currentTheme.color === 0
+                    ? "text-violet-900"
+                    : currentTheme.color === 1
+                    ? "text-blue-700"
+                    : "text-amber-900"
                 }`}
                 highlightClassName="bg-yellow-200"
                 searchWords={[query]}
@@ -158,13 +209,16 @@ export default function Sub() {
                 autoEscape={true}
                 textToHighlight={item.contents}
               />
-            </div>
+            </a>
             <div className="grid md:grid-cols-2 grid-cols-1 gap-2 px-6 pb-4">
               <div className="">
                 {item.tags.map((tag, index) => (
                   <span
                     key={index}
-                    className="inline-block bg-gray-200 rounded-full px-3 py-1 text-xs font-semibold text-gray-500 mr-2"
+                    onClick={() => {
+                      setCurrentTag(tag);
+                    }}
+                    className="inline-block bg-gray-200 rounded-full px-3 py-1 text-xs font-semibold text-gray-500 mr-2 cursor-pointer"
                   >
                     {tag}
                   </span>
@@ -174,7 +228,7 @@ export default function Sub() {
                 {item.article_datetime.slice(0, 16)}
               </div>
             </div>
-          </a>
+          </div>
         ))}
       </ul>
       {isOpen && (
@@ -201,52 +255,68 @@ export default function Sub() {
                 </svg>
               </button>
             </div>
-            <div className="grid">
-              <h3 className="mb-5 text-lg text-gray-700 font-bold text-center">
-                ブログタイトル
-              </h3>
-              <ul className="grid w-full gap-6 md:grid-cols-3">
-                {blogList.map((item) => (
-                  <li key={item.id} className="relative">
-                    <p className="absolute bottom-1 right-2 text-xs text-gray-400">
-                      {item.id}
-                    </p>
-                    <input
-                      type="radio"
-                      id={item.id}
-                      name="blogTag"
-                      defaultChecked={currentTag === item.id}
-                      className="hidden peer"
-                      onChange={(e) => {
-                        if (e.target.checked) setCurrentTag(item.id);
-                      }}
-                    />
-                    <label
-                      htmlFor={item.id}
-                      className={`inline-flex w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer  hover:text-gray-600 peer-checked:text-gray-600 hover:bg-gray-50 ${
-                        item.color === 0
-                          ? "peer-checked:border-violet-900"
-                          : "peer-checked:border-blue-700"
-                      }`}
-                    >
-                      <div className="text-center w-full">
-                        <p className="text-bold">{item.title}</p>
-                        <p className="text-sm">{item.description}</p>
-                        <p className="text-xs">{item.period}</p>
-                      </div>
-                    </label>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="grid mt-12">
-              <h3 className="mb-5 text-lg text-gray-700 font-bold text-center">
-                サブタグ
-              </h3>
-            </div>
+            <ul className="grid w-full gap-6 md:grid-cols-3 my-5">
+              {Themes.map((item) => (
+                <li key={item.id} className="relative">
+                  <p className="absolute bottom-1 right-2 text-xs text-gray-400">
+                    {item.id}
+                  </p>
+                  <input
+                    type="radio"
+                    id={item.id}
+                    name="blogTag"
+                    defaultChecked={currentTag === item.id}
+                    className="hidden peer"
+                    onChange={(e) => {
+                      if (e.target.checked) setCurrentTag(item.id);
+                    }}
+                  />
+                  <label
+                    htmlFor={item.id}
+                    className={`inline-flex w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer  hover:text-gray-600 peer-checked:text-gray-600 hover:bg-gray-50 ${
+                      item.color === 0
+                        ? "peer-checked:border-violet-900"
+                        : item.color === 1
+                        ? "peer-checked:border-blue-700"
+                        : "peer-checked:border-amber-900"
+                    }`}
+                  >
+                    <div className="text-center w-full">
+                      <p className="text-bold text-xs md:text-base">
+                        {item.title}
+                      </p>
+                      <p className="text-xs md:text-sm">{item.description}</p>
+                      <p className="text-xs">{item.period}</p>
+                    </div>
+                  </label>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       )}
+      <button
+        onClick={() => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+        className={`fixed flex justify-center items-center bottom-2 right-2 w-16 h-16 rounded-full shadow-lg hover:-rotate-12 hover:scale-150 hover:-translate-x-6 hover:-translate-y-6 ${
+          currentTheme.color === 0
+            ? "bg-violet-900"
+            : currentTheme.color === 1
+            ? "bg-blue-700"
+            : "bg-amber-900"
+        } ${
+          isLogo ? "opacity-100" : "opacity-0 pointer-events-none"
+        } transition-opacity duration-500`}
+      >
+        <Image
+          className="-m-2 max-w-none"
+          src={currentTheme.icon === 0 ? "/dragon.png" : "/humblers.png"}
+          width={100}
+          height={100}
+          alt="aa"
+        />
+      </button>
     </main>
   );
 }
