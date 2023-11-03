@@ -40,6 +40,14 @@ import ameblo_tohokulaxmgs_17 from "@/public/ameblo_tohokulaxmgs16/2017.json";
 import ameblo_tohokulaxmgs_18 from "@/public/ameblo_tohokulaxmgs16/2018.json";
 import ameblo_tohokulaxmgs_19 from "@/public/ameblo_tohokulaxmgs16/2019.json";
 import livdoor_jolax_data from "@/public/livedoor_jolax.json";
+import ameblo_tohokulaxmgs from "@/public/ameblo_tohokulaxmgs/2009.json";
+import ameblo_passer_hiro_07 from "@/public/ameblo_passer-hiro53/2007.json";
+import ameblo_passer_hiro_08 from "@/public/ameblo_passer-hiro53/2008.json";
+import ameblo_passer_hiro_09 from "@/public/ameblo_passer-hiro53/2009.json";
+import ameblo_passer_hiro_10 from "@/public/ameblo_passer-hiro53/2010.json";
+import ameblo_passer_hiro_11 from "@/public/ameblo_passer-hiro53/2011.json";
+import ameblo_jolax_tohoku_09 from "@/public/ameblo_jolax-tohoku/2009.json";
+import ameblo_jolax_tohoku_10 from "@/public/ameblo_jolax-tohoku/2010.json";
 
 export const ameblo_tohokulax_data: ListItem[] = [
   ...ameblo_tohokulax_23,
@@ -90,10 +98,26 @@ export const ameblo_tohokulaxmgs_data: ListItem[] = [
   ...ameblo_tohokulaxmgs_10,
 ];
 
+export const ameblo_passer_hiro_data: ListItem[] = [
+  ...ameblo_passer_hiro_11,
+  ...ameblo_passer_hiro_10,
+  ...ameblo_passer_hiro_09,
+  ...ameblo_passer_hiro_08,
+  ...ameblo_passer_hiro_07,
+];
+
+export const ameblo_jolax_tohoku_data: ListItem[] = [
+  ...ameblo_jolax_tohoku_10,
+  ...ameblo_jolax_tohoku_09,
+];
+
 const data = [
   ...ameblo_tohokulax_data,
   ...ameblo_humblers_data,
   ...ameblo_tohokulaxmgs_data,
   ...livdoor_jolax_data,
+  ...ameblo_tohokulaxmgs,
+  ...ameblo_passer_hiro_data,
+  ...ameblo_jolax_tohoku_data,
 ];
 export default data;
