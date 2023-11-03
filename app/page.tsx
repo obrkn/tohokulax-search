@@ -126,6 +126,7 @@ export default function Home() {
     }
     return Themes[0];
   });
+  const [numOfDisplay, setNumOfDisplay] = React.useState(30);
 
   React.useEffect(() => {
     Modal.setAppElement("#__next");
@@ -150,22 +151,6 @@ export default function Home() {
     localStorage.setItem("currentThemeId", currentTheme.id);
   }, [currentTheme]);
 
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.target;
-    setQuery(value);
-
-    if (value.length === 0) {
-      setResults(rawData);
-      return;
-    }
-
-    setResults(
-      rawData.filter(
-        (item) => item.title.includes(value) || item.contents.includes(value)
-      )
-    );
-  };
-
   React.useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 600) {
@@ -177,6 +162,36 @@ export default function Home() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      if (
+        window.innerHeight + document.documentElement.scrollTop >=
+        document.documentElement.offsetHeight - 300
+      ) {
+        setNumOfDisplay((prev) => prev + 30);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+    setQuery(value);
+
+    if (value.length === 0) {
+      setResults(rawData);
+      return;
+    }
+    setNumOfDisplay(30);
+
+    setResults(
+      rawData.filter(
+        (item) => item.title.includes(value) || item.contents.includes(value)
+      )
+    );
+  };
 
   return (
     <main className="container mx-auto px-4 my-12">
@@ -246,7 +261,7 @@ export default function Home() {
         </span>
       </div>
       <ul>
-        {results.slice(0, 30).map((item) => (
+        {results.slice(0, numOfDisplay).map((item) => (
           <div
             key={item.id}
             className={`rounded overflow-hidden shadow hover:shadow-lg hover:scale-105 mt-8 hover:border-2 ${
