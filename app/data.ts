@@ -48,6 +48,7 @@ import ameblo_passer_hiro_10 from "@/public/ameblo_passer-hiro53/2010.json";
 import ameblo_passer_hiro_11 from "@/public/ameblo_passer-hiro53/2011.json";
 import ameblo_jolax_tohoku_09 from "@/public/ameblo_jolax-tohoku/2009.json";
 import ameblo_jolax_tohoku_10 from "@/public/ameblo_jolax-tohoku/2010.json";
+import binwan_tohoku_jugem from "@/public/binwan-tohoku_jugem.json";
 
 export const ameblo_tohokulax_data: ListItem[] = [
   ...ameblo_tohokulax_23,
@@ -119,5 +120,6 @@ const data = [
   ...ameblo_tohokulaxmgs,
   ...ameblo_passer_hiro_data,
   ...ameblo_jolax_tohoku_data,
+  ...binwan_tohoku_jugem,
 ];
 export default data;

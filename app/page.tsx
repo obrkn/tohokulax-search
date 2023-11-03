@@ -60,6 +60,14 @@ const Themes = [
     icon: Icon.Humbler,
   },
   {
+    id: "livedoor#jolax",
+    title: "へこたれへん！！！！",
+    description: "東北大女子ラクロス部★部内日記",
+    period: "2006年 - 2017年",
+    color: Color.Pink700,
+    icon: Icon.Humbler,
+  },
+  {
     id: "ameblo#tohokulaxmgs16",
     title: "東北大学男子ラクロス部チームスタッフブログ",
     description: "東北大学男子ラクロス部チームスタッフのブログです。",
@@ -68,12 +76,12 @@ const Themes = [
     icon: Icon.Dragon,
   },
   {
-    id: "livedoor#jolax",
-    title: "へこたれへん！！！！",
-    description: "東北大女子ラクロス部★部内日記",
-    period: "2006年 - 2017年",
-    color: Color.Pink700,
-    icon: Icon.Humbler,
+    id: "ameblo#passer-hiro53",
+    title: "ケニアより愛を込めて",
+    description: "日本が恋しいです。冗談だけど。",
+    period: "2007年 - 2011年",
+    color: Color.Green800,
+    icon: Icon.Dragon,
   },
   {
     id: "binwan-tohoku#jugem",
@@ -91,14 +99,6 @@ const Themes = [
     period: "2009年 - 2010年",
     color: Color.Cyan600,
     icon: Icon.Humbler,
-  },
-  {
-    id: "ameblo#passer-hiro53",
-    title: "ケニアより愛を込めて",
-    description: "日本が恋しいです。冗談だけど。",
-    period: "2007年 - 2011年",
-    color: Color.Green800,
-    icon: Icon.Dragon,
   },
   {
     id: "ameblo#tohokulaxmgs",
