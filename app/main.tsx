@@ -146,18 +146,18 @@ export default function Main({
         />
         <span
           onClick={() => setIsOpen(true)}
-          className="hidden md:inline-block bg-gray-200 rounded-full px-3 py-1 text-xs font-semibold text-gray-500 cursor-pointer hover:scale-105"
+          className="hidden md:inline-block bg-gray-200 rounded-full px-3 py-1 text-xs font-semibold text-gray-500 cursor-pointer hover:scale-110"
         >
           {currentTag}
         </span>
       </div>
-      <div className="text-right mr-2 mt-2">
-        <span className="text-gray-400 text-sm">
+      <div className="text-right mt-2">
+        <span className="text-gray-400 text-sm mr-2">
           {results.length} / {rawData.length}
         </span>
         <span
           onClick={() => setIsOpen(true)}
-          className="md:hidden bg-gray-200 rounded-full px-3 py-1 text-xs font-semibold text-gray-500 cursor-pointer hover:scale-105 ml-2"
+          className="md:hidden bg-gray-200 rounded-full px-3 py-1 text-xs font-semibold text-gray-500 cursor-pointer hover:scale-110"
         >
           {currentTag}
         </span>
@@ -268,7 +268,7 @@ export default function Main({
         onRequestClose={() => setIsOpen(false)}
         ariaHideApp={false}
         overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center overflow-y-auto"
-        className="bg-white p-4 m-4 rounded outline-none max-h-full overflow-y-auto"
+        className="bg-white p-4 m-4 rounded-lg outline-none max-h-full overflow-y-auto"
       >
         <div className="text-right">
           <button
@@ -276,7 +276,7 @@ export default function Main({
             className="text-gray-500 hover:text-gray-600"
           >
             <svg
-              className="w-6 h-6 fill-current"
+              className="w-10 h-10 fill-current"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 20 20"

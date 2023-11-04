@@ -45,7 +45,7 @@ pages.each do |page|
       id: SecureRandom.uuid,
       title: ele.css('h2.entry_title').inner_text.strip,
       tags: tags,
-      url: 'http://binwan-tohoku.jugem.jp/?page=36',
+      url: page.zero? ? 'http://binwan-tohoku.jugem.jp' : "http://binwan-tohoku.jugem.jp/?page=#{page}",
       contents: contents,
       article_datetime: article_datetime,
       secure_type: 0,
