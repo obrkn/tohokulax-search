@@ -1,13 +1,12 @@
 "use client";
 
-// import data_2008 from "@/public/ameblo_tohokulax08/2008.json";
 import Highlighter from "react-highlight-words";
 import React from "react";
 import DefaultData from "./data";
 import Image from "next/image";
 import Modal from "react-modal";
 import Cookie from "js-cookie";
-import { themes, Theme, ListItem, ThemeId } from "./library";
+import { themes, Theme, ListItem } from "./library";
 
 export default function Main({
   initialTag,
@@ -48,8 +47,8 @@ export default function Main({
     const theme = themes.find((item) => item.id === currentTag);
     setCurrentTheme((prev) => theme || prev);
     window.scrollTo({ top: 0, behavior: "smooth" });
-    Cookie.set("currentTag", currentTag);
-    if (theme?.id) Cookie.set("currentThemeId", theme.id);
+    Cookie.set("currentTag", currentTag, { expires: 365 });
+    if (theme?.id) Cookie.set("currentThemeId", theme.id, { expires: 365 });
     setLoading(false);
   }, [currentTag]);
 
@@ -362,7 +361,7 @@ export default function Main({
           src={currentTheme.icon === 0 ? "/dragon.png" : "/humblers.png"}
           width={100}
           height={100}
-          alt="aa"
+          alt="logo"
         />
       </button>
     </main>
