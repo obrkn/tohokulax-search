@@ -3,7 +3,7 @@
 // import data_2008 from "@/public/ameblo_tohokulax08/2008.json";
 import Highlighter from "react-highlight-words";
 import React from "react";
-import DefaultData from "@/app/data";
+import DefaultData from "./data";
 import Image from "next/image";
 import Modal from "react-modal";
 import Cookie from "js-cookie";

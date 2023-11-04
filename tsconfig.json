@@ -27,6 +27,11 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
+    "src/tiny-segmenter.d.ts",
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
     "src/tiny-segmenter.d.ts"
   ],
   "exclude": ["node_modules"]
