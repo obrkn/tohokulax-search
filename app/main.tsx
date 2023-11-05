@@ -167,7 +167,7 @@ export default function Main({
             className="motion-safe:animate-ping rounded-full"
             src={
               currentTheme.icon === 0
-                ? "/dragon_loading.png"
+                ? "/dragon_loading.jpg"
                 : "/humblers_loading.jpeg"
             }
             width={currentTheme.icon === 0 ? 100 : 80}
