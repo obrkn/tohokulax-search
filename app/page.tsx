@@ -3,6 +3,7 @@
 import Main from "@/app/main";
 import { cookies } from "next/headers";
 import { themes, Theme } from "./library";
+import Script from "next/script";
 
 export default async function Home() {
   const cookieStore = cookies();
@@ -16,10 +17,22 @@ export default async function Home() {
   const isFirstVisit = cookieStore.get("currentTag") === undefined;
 
   return (
-    <Main
-      initialTag={initialTag}
-      initialTheme={initialTheme}
-      isFirstVisit={isFirstVisit}
-    />
+    <>
+      <Script src="https://www.googletagmanager.com/gtag/js?id=G-NBPLB36R8J" />
+      <Script id="google-analytics">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-NBPLB36R8J');
+        `}
+      </Script>
+      <Main
+        initialTag={initialTag}
+        initialTheme={initialTheme}
+        isFirstVisit={isFirstVisit}
+      />
+    </>
   );
 }
