@@ -6,7 +6,7 @@ import DefaultData from "./data";
 import Image from "next/image";
 import Cookie from "js-cookie";
 import { themes, Theme, ListItem, colorList } from "./library";
-import { Dialog, Transition, RadioGroup, Listbox } from "@headlessui/react";
+import { Dialog, Transition, RadioGroup } from "@headlessui/react";
 import YearTag from "./components/yearTag";
 
 export default function Main({
@@ -28,7 +28,7 @@ export default function Main({
   const [numOfDisplay, setNumOfDisplay] = React.useState(30);
   const [loading, setLoading] = React.useState(true);
   const [ascOn, setAscOn] = React.useState(false);
-  const [year, setYear] = React.useState<number | null>(null);
+  const [year, setYear] = React.useState<number>(0);
 
   React.useEffect(() => {
     setLoading(true);
@@ -37,6 +37,11 @@ export default function Main({
     let results = DefaultData.filter((item) =>
       item.tags.some((tag: string) => tag === currentTag)
     );
+    if (year !== 0) {
+      results = results.filter(
+        (item) => Number(item.article_datetime.slice(0, 4)) === year
+      );
+    }
     setTotal(results.length);
     if (ascOn) {
       results = results.reverse();
@@ -52,7 +57,7 @@ export default function Main({
     Cookie.set("currentTag", currentTag, { expires: 365 });
     if (theme?.id) Cookie.set("currentThemeId", theme.id, { expires: 365 });
     setLoading(false);
-  }, [currentTag, ascOn, query]);
+  }, [currentTag, ascOn, query, year]);
 
   React.useEffect(() => {
     const handleScroll = () => {
