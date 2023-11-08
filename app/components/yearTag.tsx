@@ -6,12 +6,13 @@ export default function YearTag({
   year,
   yearFunc,
   currentTheme,
+  yearOptions,
 }: {
   year: number;
   yearFunc: (val: number) => void;
   currentTheme: Theme;
+  yearOptions: number[];
 }) {
-  const yearOptions = [0, ...[...Array(16)].map((_, i) => i + 2008)];
   return (
     <Listbox value={year} onChange={yearFunc}>
       <div className="relative inline">

@@ -19,7 +19,7 @@ export default function Main({
   isFirstVisit: boolean;
 }) {
   const [query, setQuery] = React.useState("");
-  const [total, setTotal] = React.useState<number>(DefaultData.length);
+  const [rawData, setRawData] = React.useState<ListItem[]>(DefaultData);
   const [results, setResults] = React.useState<ListItem[]>(DefaultData);
   const [isOpen, setIsOpen] = React.useState(isFirstVisit);
   const [currentTag, setCurrentTag] = React.useState(initialTag);
@@ -29,35 +29,52 @@ export default function Main({
   const [loading, setLoading] = React.useState(true);
   const [ascOn, setAscOn] = React.useState(false);
   const [year, setYear] = React.useState<number>(0);
+  const [yearOptions, setYearOptions] = React.useState<number[]>([0]);
 
   React.useEffect(() => {
     setLoading(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
     setNumOfDisplay(30);
-    let results = DefaultData.filter((item) =>
+    const tagFilteredResults = DefaultData.filter((item) =>
       item.tags.some((tag: string) => tag === currentTag)
     );
+    setYearOptions(() => {
+      const set: Set<number> = new Set();
+      tagFilteredResults.forEach((item) =>
+        set.add(Number(item.article_datetime.slice(0, 4)))
+      );
+
+      return [0, ...Array.from(set)];
+    });
+    let yearFilteredResults = tagFilteredResults;
     if (year !== 0) {
-      results = results.filter(
+      yearFilteredResults = yearFilteredResults.filter(
         (item) => Number(item.article_datetime.slice(0, 4)) === year
       );
     }
-    setTotal(results.length);
+    setRawData(yearFilteredResults);
+    let queryFilteredResults = yearFilteredResults;
     if (ascOn) {
-      results = results.reverse();
+      queryFilteredResults = queryFilteredResults.reverse();
     }
     if (query.length > 0) {
-      results = results.filter(
+      queryFilteredResults = queryFilteredResults.filter(
         (item) => item.title.includes(query) || item.contents.includes(query)
       );
     }
-    setResults(results);
+    setResults(queryFilteredResults);
     const theme = themes.find((item) => item.id === currentTag);
     setCurrentTheme((prev) => theme || prev);
     Cookie.set("currentTag", currentTag, { expires: 365 });
     if (theme?.id) Cookie.set("currentThemeId", theme.id, { expires: 365 });
     setLoading(false);
   }, [currentTag, ascOn, query, year]);
+
+  React.useEffect(() => {
+    if (!yearOptions.includes(year)) {
+      setYear(0);
+    }
+  }, [yearOptions, year]);
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -141,10 +158,11 @@ export default function Main({
             year={year}
             yearFunc={(val) => setYear(val)}
             currentTheme={currentTheme}
+            yearOptions={yearOptions}
           />
         </span>
         <span className="inline md:hidden text-gray-400 text-sm mr-2">
-          {results.length} / {total}
+          {results.length} / {rawData.length}
         </span>
       </div>
       <div className="text-right mt-2">
@@ -165,10 +183,11 @@ export default function Main({
             year={year}
             yearFunc={(val) => setYear(val)}
             currentTheme={currentTheme}
+            yearOptions={yearOptions}
           />
         </span>
         <span className="hidden md:inline text-gray-400 text-sm mr-2">
-          {results.length} / {total}
+          {results.length} / {rawData.length}
         </span>
       </div>
       {loading ? (
