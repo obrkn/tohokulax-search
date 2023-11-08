@@ -1,12 +1,13 @@
 "use client";
 
 import Highlighter from "react-highlight-words";
-import React from "react";
+import React, { Fragment } from "react";
 import DefaultData from "./data";
 import Image from "next/image";
-import Modal from "react-modal";
 import Cookie from "js-cookie";
-import { themes, Theme, ListItem } from "./library";
+import { themes, Theme, ListItem, colorList } from "./library";
+import { Dialog, Transition, RadioGroup, Listbox } from "@headlessui/react";
+import YearTag from "./components/yearTag";
 
 export default function Main({
   initialTag,
@@ -18,7 +19,7 @@ export default function Main({
   isFirstVisit: boolean;
 }) {
   const [query, setQuery] = React.useState("");
-  const [rawData, setRawData] = React.useState<ListItem[]>(DefaultData);
+  const [total, setTotal] = React.useState<number>(DefaultData.length);
   const [results, setResults] = React.useState<ListItem[]>(DefaultData);
   const [isOpen, setIsOpen] = React.useState(isFirstVisit);
   const [currentTag, setCurrentTag] = React.useState(initialTag);
@@ -26,31 +27,32 @@ export default function Main({
   const [currentTheme, setCurrentTheme] = React.useState<Theme>(initialTheme);
   const [numOfDisplay, setNumOfDisplay] = React.useState(30);
   const [loading, setLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    Modal.setAppElement("#__next");
-  }, []);
+  const [ascOn, setAscOn] = React.useState(false);
+  const [year, setYear] = React.useState<number | null>(null);
 
   React.useEffect(() => {
     setLoading(true);
-    setRawData(
-      DefaultData.filter((item) =>
-        item.tags.some((tag: string) => tag === currentTag)
-      )
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    setNumOfDisplay(30);
+    let results = DefaultData.filter((item) =>
+      item.tags.some((tag: string) => tag === currentTag)
     );
-    setResults(
-      DefaultData.filter((item) =>
-        item.tags.some((tag: string) => tag === currentTag)
-      )
-    );
-    setQuery("");
+    setTotal(results.length);
+    if (ascOn) {
+      results = results.reverse();
+    }
+    if (query.length > 0) {
+      results = results.filter(
+        (item) => item.title.includes(query) || item.contents.includes(query)
+      );
+    }
+    setResults(results);
     const theme = themes.find((item) => item.id === currentTag);
     setCurrentTheme((prev) => theme || prev);
-    window.scrollTo({ top: 0, behavior: "smooth" });
     Cookie.set("currentTag", currentTag, { expires: 365 });
     if (theme?.id) Cookie.set("currentThemeId", theme.id, { expires: 365 });
     setLoading(false);
-  }, [currentTag]);
+  }, [currentTag, ascOn, query]);
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -80,18 +82,6 @@ export default function Main({
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     setQuery(value);
-
-    if (value.length === 0) {
-      setResults(rawData);
-      return;
-    }
-    setNumOfDisplay(30);
-
-    setResults(
-      rawData.filter(
-        (item) => item.title.includes(value) || item.contents.includes(value)
-      )
-    );
   };
 
   return (
@@ -101,21 +91,7 @@ export default function Main({
       </div>
       <div
         className={`relative flex items-center border-b-2 py-2 ${
-          currentTheme.color === 0
-            ? "border-violet-900"
-            : currentTheme.color === 1
-            ? "border-blue-700"
-            : currentTheme.color === 2
-            ? "border-amber-700"
-            : currentTheme.color === 3
-            ? `border-pink-700`
-            : currentTheme.color === 4
-            ? `border-purple-600`
-            : currentTheme.color === 5
-            ? `border-cyan-600`
-            : currentTheme.color === 6
-            ? `border-green-800`
-            : `border-red-500`
+          colorList.border[currentTheme.color]
         }`}
       >
         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -143,22 +119,51 @@ export default function Main({
           placeholder="Search"
           autoFocus
         />
-        <span
-          onClick={() => setIsOpen(true)}
-          className="hidden md:inline-block bg-gray-200 rounded-full px-3 py-1 text-xs font-semibold text-gray-500 cursor-pointer hover:scale-110"
-        >
-          {currentTag}
+        <span className="hidden md:inline">
+          <span
+            onClick={() => setIsOpen(true)}
+            className="bg-gray-200 rounded-full px-3 py-1 mr-3 text-xs font-semibold text-gray-500 cursor-pointer hover:scale-110"
+          >
+            {currentTag}
+          </span>
+          <span
+            onClick={() => setAscOn((prev) => !prev)}
+            className="bg-gray-200 rounded-full px-3 py-1 mr-3 text-xs font-semibold text-gray-500 cursor-pointer hover:scale-110"
+          >
+            {ascOn ? "古い順" : "新しい順"}
+          </span>
+          <YearTag
+            year={year}
+            yearFunc={(val) => setYear(val)}
+            currentTheme={currentTheme}
+          />
+        </span>
+        <span className="inline md:hidden text-gray-400 text-sm mr-2">
+          {results.length} / {total}
         </span>
       </div>
       <div className="text-right mt-2">
-        <span className="text-gray-400 text-sm mr-2">
-          {results.length} / {rawData.length}
+        <span className="inline md:hidden">
+          <span
+            onClick={() => setIsOpen(true)}
+            className="bg-gray-200 rounded-full px-3 py-1 mr-3 text-xs font-semibold text-gray-500 cursor-pointer hover:scale-110"
+          >
+            {currentTag}
+          </span>
+          <span
+            onClick={() => setAscOn((prev) => !prev)}
+            className="bg-gray-200 rounded-full px-3 py-1 mr-3 text-xs font-semibold text-gray-500 cursor-pointer hover:scale-110"
+          >
+            {ascOn ? "古い順" : "新しい順"}
+          </span>
+          <YearTag
+            year={year}
+            yearFunc={(val) => setYear(val)}
+            currentTheme={currentTheme}
+          />
         </span>
-        <span
-          onClick={() => setIsOpen(true)}
-          className="md:hidden bg-gray-200 rounded-full px-3 py-1 text-xs font-semibold text-gray-500 cursor-pointer hover:scale-110"
-        >
-          {currentTag}
+        <span className="hidden md:inline text-gray-400 text-sm mr-2">
+          {results.length} / {total}
         </span>
       </div>
       {loading ? (
@@ -181,21 +186,7 @@ export default function Main({
             <div
               key={item.id}
               className={`rounded overflow-hidden shadow hover:shadow-lg hover:scale-105 mt-8 hover:border-2 ${
-                currentTheme.color === 0
-                  ? "hover:border-violet-900"
-                  : currentTheme.color === 1
-                  ? "hover:border-blue-700"
-                  : currentTheme.color === 2
-                  ? "hover:border-amber-700"
-                  : currentTheme.color === 3
-                  ? "hover:border-pink-700"
-                  : currentTheme.color === 4
-                  ? "hover:border-purple-600"
-                  : currentTheme.color === 5
-                  ? "hover:border-cyan-600"
-                  : currentTheme.color === 6
-                  ? "hover:border-green-800"
-                  : "hover:border-red-500"
+                colorList.hoverBorder[currentTheme.color]
               }`}
             >
               <a
@@ -206,21 +197,7 @@ export default function Main({
               >
                 <Highlighter
                   className={`block font-bold text-base mb-2 ${
-                    currentTheme.color === 0
-                      ? "text-violet-900"
-                      : currentTheme.color === 1
-                      ? "text-blue-700"
-                      : currentTheme.color === 2
-                      ? "text-amber-700"
-                      : currentTheme.color === 3
-                      ? "text-pink-700"
-                      : currentTheme.color === 4
-                      ? "text-purple-600"
-                      : currentTheme.color === 5
-                      ? "text-cyan-600"
-                      : currentTheme.color === 6
-                      ? "text-green-800"
-                      : "text-red-500"
+                    colorList.text[currentTheme.color]
                   }`}
                   highlightClassName="bg-yellow-200"
                   searchWords={[query]}
@@ -262,96 +239,150 @@ export default function Main({
           ))}
         </ul>
       )}
-      <Modal
-        isOpen={isOpen}
-        onRequestClose={() => setIsOpen(false)}
-        ariaHideApp={false}
-        overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center overflow-y-auto"
-        className="bg-white p-4 m-4 rounded-lg outline-none max-h-full overflow-y-auto"
-      >
-        <div className="text-right">
-          <button
-            onClick={() => setIsOpen(false)}
-            className="text-gray-500 hover:text-gray-600"
+
+      <Transition appear show={isOpen} as={Fragment}>
+        <Dialog
+          as="div"
+          className="relative z-10"
+          onClose={() => setIsOpen(false)}
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
           >
-            <svg
-              className="w-10 h-10 fill-current"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-            >
-              <path d="m10.707 10 4.147-4.146a.5.5 0 1 0 -.707-.708l-4.147 4.146-4.146-4.146a.5.5 0 0 0 -.708.708l4.146 4.146-4.146 4.147a.5.5 0 1 0 .708.707l4.146-4.146 4.147 4.146a.5.5 0 1 0 .707-.707z" />
-            </svg>
-          </button>
-        </div>
-        <ul className="grid w-full gap-3 md:grid-cols-3 mt-5">
-          {themes.map((item) => (
-            <li key={item.id} className="relative h-auto">
-              <p className="absolute bottom-1 right-2 text-xs text-gray-400">
-                {item.id}
-              </p>
-              <input
-                type="radio"
-                id={item.id}
-                name="blogTag"
-                defaultChecked={currentTheme.id === item.id}
-                className="hidden peer"
-                onChange={(e) => {
-                  if (e.target.checked) {
-                    setCurrentTag(item.id);
-                  }
-                }}
-              />
-              <label
-                htmlFor={item.id}
-                className={`inline-flex w-full h-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer  hover:text-gray-600 peer-checked:text-gray-600 hover:bg-gray-50 ${
-                  item.color === 0
-                    ? "peer-checked:border-violet-900"
-                    : item.color === 1
-                    ? "peer-checked:border-blue-700"
-                    : item.color === 2
-                    ? "peer-checked:border-amber-700"
-                    : item.color === 3
-                    ? "peer-checked:border-pink-700"
-                    : item.color === 4
-                    ? "peer-checked:border-purple-600"
-                    : item.color === 5
-                    ? "peer-checked:border-cyan-600"
-                    : item.color === 6
-                    ? "peer-checked:border-green-800"
-                    : "peer-checked:border-red-500"
-                }`}
+            <div className="fixed inset-0 bg-black/25" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
               >
-                <div className="text-center w-full">
-                  <p className="text-bold text-xs md:text-base">{item.title}</p>
-                  <p className="text-xs md:text-sm">{item.description}</p>
-                  <p className="text-xs">{item.period}</p>
-                </div>
-              </label>
-            </li>
-          ))}
-        </ul>
-      </Modal>
+                <Dialog.Panel className="w-full transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                  <div className="w-full text-right">
+                    <button
+                      onClick={() => setIsOpen(false)}
+                      className="text-gray-500 hover:text-gray-600"
+                    >
+                      <svg
+                        className="w-10 h-10 fill-current"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                      >
+                        <path d="m10.707 10 4.147-4.146a.5.5 0 1 0 -.707-.708l-4.147 4.146-4.146-4.146a.5.5 0 0 0 -.708.708l4.146 4.146-4.146 4.147a.5.5 0 1 0 .708.707l4.146-4.146 4.147 4.146a.5.5 0 1 0 .707-.707z" />
+                      </svg>
+                    </button>
+                  </div>
+                  <RadioGroup
+                    value={currentTheme}
+                    onChange={(value) => setCurrentTag(value.id)}
+                  >
+                    <RadioGroup.Label className="sr-only">
+                      blogTag
+                    </RadioGroup.Label>
+                    <div className="grid w-full gap-3 md:grid-cols-3 mt-5">
+                      {themes.map((theme) => (
+                        <RadioGroup.Option
+                          key={theme.id}
+                          value={theme}
+                          className={({ active, checked }) =>
+                            `${
+                              active
+                                ? `ring-2 ring-white/60 ring-offset-2 ${
+                                    colorList.ringOffset[theme.color]
+                                  }`
+                                : ""
+                            }
+                                ${
+                                  checked
+                                    ? `${
+                                        colorList.bg75[theme.color]
+                                      } text-white`
+                                    : "bg-white"
+                                }
+                                  relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus:outline-none`
+                          }
+                        >
+                          {({ active, checked }) => (
+                            <>
+                              <div className="flex w-full items-center justify-between">
+                                <div className="flex items-center">
+                                  <div className="text-sm">
+                                    <RadioGroup.Label
+                                      as="p"
+                                      className={`font-medium  ${
+                                        checked ? "text-white" : "text-gray-900"
+                                      }`}
+                                    >
+                                      {theme.title}
+                                    </RadioGroup.Label>
+                                    <RadioGroup.Description
+                                      as="span"
+                                      className={`inline ${
+                                        checked
+                                          ? "text-sky-100"
+                                          : "text-gray-500"
+                                      }`}
+                                    >
+                                      {theme.description}
+                                    </RadioGroup.Description>
+                                  </div>
+                                </div>
+                                {checked && (
+                                  <div className="shrink-0 text-white">
+                                    <svg
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      className="h-6 w-6"
+                                    >
+                                      <circle
+                                        cx={12}
+                                        cy={12}
+                                        r={12}
+                                        fill="#fff"
+                                        opacity="0.2"
+                                      />
+                                      <path
+                                        d="M7 13l3 3 7-7"
+                                        stroke="#fff"
+                                        strokeWidth={1.5}
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                      />
+                                    </svg>
+                                  </div>
+                                )}
+                              </div>
+                            </>
+                          )}
+                        </RadioGroup.Option>
+                      ))}
+                    </div>
+                  </RadioGroup>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
       <button
         onClick={() => {
           window.scrollTo({ top: 0, behavior: "smooth" });
         }}
         className={`fixed flex justify-center items-center bottom-2 right-4 w-16 h-16 rounded-full shadow-lg hover:-rotate-12 hover:scale-150 hover:-translate-x-6 hover:-translate-y-6 ${
-          currentTheme.color === 0
-            ? "bg-violet-900"
-            : currentTheme.color === 1
-            ? "bg-blue-700"
-            : currentTheme.color === 2
-            ? "bg-amber-700"
-            : currentTheme.color === 3
-            ? "bg-pink-700"
-            : currentTheme.color === 4
-            ? "bg-purple-600"
-            : currentTheme.color === 5
-            ? "bg-cyan-600"
-            : currentTheme.color === 6
-            ? "bg-green-800"
-            : "bg-red-500"
+          colorList.bg[currentTheme.color]
         } ${
           isLogo ? "opacity-100" : "opacity-0 pointer-events-none"
         } transition-opacity duration-500`}

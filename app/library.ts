@@ -119,3 +119,97 @@ export const themes: {
     icon: Icon.Dragon,
   },
 ];
+
+export interface ColorList {
+  border: { [key in Color]: string };
+  hoverBorder: { [key in Color]: string };
+  text: { [key in Color]: string };
+  peerCheckedBorder: { [key in Color]: string };
+  bg: { [key in Color]: string };
+  bg75: { [key in Color]: string };
+  bg25: { [key in Color]: string };
+  ringOffset: { [key in Color]: string };
+}
+
+export const colorList: ColorList = {
+  border: {
+    [Color.Violet900]: "border-violet-900",
+    [Color.Blue700]: "border-blue-700",
+    [Color.Amber700]: "border-amber-700",
+    [Color.Pink700]: "border-pink-700",
+    [Color.Purple600]: "border-purple-600",
+    [Color.Cyan600]: "border-cyan-600",
+    [Color.Green800]: "border-green-800",
+    [Color.Red500]: "border-red-500",
+  },
+  hoverBorder: {
+    [Color.Violet900]: "hover:border-violet-900",
+    [Color.Blue700]: "hover:border-blue-700",
+    [Color.Amber700]: "hover:border-amber-700",
+    [Color.Pink700]: "hover:border-pink-700",
+    [Color.Purple600]: "hover:border-purple-600",
+    [Color.Cyan600]: "hover:border-cyan-600",
+    [Color.Green800]: "hover:border-green-800",
+    [Color.Red500]: "hover:border-red-500",
+  },
+  text: {
+    [Color.Violet900]: "text-violet-900",
+    [Color.Blue700]: "text-blue-700",
+    [Color.Amber700]: "text-amber-700",
+    [Color.Pink700]: "text-pink-700",
+    [Color.Purple600]: "text-purple-600",
+    [Color.Cyan600]: "text-cyan-600",
+    [Color.Green800]: "text-green-800",
+    [Color.Red500]: "text-red-500",
+  },
+  peerCheckedBorder: {
+    [Color.Violet900]: "peer-checked:border-violet-900",
+    [Color.Blue700]: "peer-checked:border-blue-700",
+    [Color.Amber700]: "peer-checked:border-amber-700",
+    [Color.Pink700]: "peer-checked:border-pink-700",
+    [Color.Purple600]: "peer-checked:border-purple-600",
+    [Color.Cyan600]: "peer-checked:border-cyan-600",
+    [Color.Green800]: "peer-checked:border-green-800",
+    [Color.Red500]: "peer-checked:border-red-500",
+  },
+  bg: {
+    [Color.Violet900]: "bg-violet-900",
+    [Color.Blue700]: "bg-blue-700",
+    [Color.Amber700]: "bg-amber-700",
+    [Color.Pink700]: "bg-pink-700",
+    [Color.Purple600]: "bg-purple-600",
+    [Color.Cyan600]: "bg-cyan-600",
+    [Color.Green800]: "bg-green-800",
+    [Color.Red500]: "bg-red-500",
+  },
+  bg75: {
+    [Color.Violet900]: "bg-violet-900/75",
+    [Color.Blue700]: "bg-blue-700/75",
+    [Color.Amber700]: "bg-amber-700/75",
+    [Color.Pink700]: "bg-pink-700/75",
+    [Color.Purple600]: "bg-purple-600/75",
+    [Color.Cyan600]: "bg-cyan-600/75",
+    [Color.Green800]: "bg-green-800/75",
+    [Color.Red500]: "bg-red-500/75",
+  },
+  bg25: {
+    [Color.Violet900]: "bg-violet-900/25",
+    [Color.Blue700]: "bg-blue-700/25",
+    [Color.Amber700]: "bg-amber-700/25",
+    [Color.Pink700]: "bg-pink-700/25",
+    [Color.Purple600]: "bg-purple-600/25",
+    [Color.Cyan600]: "bg-cyan-600/25",
+    [Color.Green800]: "bg-green-800/25",
+    [Color.Red500]: "bg-red-500/25",
+  },
+  ringOffset: {
+    [Color.Violet900]: "ring-offset-violet-900/25",
+    [Color.Blue700]: "ring-offset-blue-700/25",
+    [Color.Amber700]: "ring-offset-amber-700/25",
+    [Color.Pink700]: "ring-offset-pink-700/25",
+    [Color.Purple600]: "ring-offset-purple-600/25",
+    [Color.Cyan600]: "ring-offset-cyan-600/25",
+    [Color.Green800]: "ring-offset-green-800/25",
+    [Color.Red500]: "ring-offset-red-500/25",
+  },
+};
