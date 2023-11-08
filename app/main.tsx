@@ -165,7 +165,7 @@ export default function Main({
           {results.length} / {rawData.length}
         </span>
       </div>
-      <div className="text-right mt-2">
+      <div className="text-right mt-2 -ml-12">
         <span className="inline md:hidden">
           <span
             onClick={() => setIsOpen(true)}
@@ -354,13 +354,15 @@ export default function Main({
                                     </RadioGroup.Label>
                                     <RadioGroup.Description
                                       as="span"
-                                      className={`inline ${
+                                      className={`inline text-xs ${
                                         checked
                                           ? "text-sky-100"
                                           : "text-gray-500"
                                       }`}
                                     >
                                       {theme.description}
+                                      <br />
+                                      {theme.period}
                                     </RadioGroup.Description>
                                   </div>
                                 </div>
